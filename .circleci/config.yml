@@ -40,12 +40,20 @@ jobs:
            aws ec2 describe-instances \
             --filters Name=tag:Name,Values=web-server-db \
             --query "Reservations[].Instances[].PublicDnsName" \
-            --region=$region > db.txt
+            --region=$region | tee db_dns.txt
+           
+           echo ls
+           ls -al
+           ls -al .circleci
+           cp db_dns.txt .circleci
+           echo ls
+           ls -al
+           ls -al .circleci
       
       - save_cache:
           key: db_dns
           paths:
-            - ./db.txt
+            - ./db_dns.txt
 
 
 # Invoke jobs via workflows
