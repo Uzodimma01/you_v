@@ -1,0 +1,35 @@
+{
+  "name": "refactor-ecommerce-website",
+  "version": "1.0.0",
+  "description": "Refactor e-commerce website to microservices, a project from katjuell <kathleenjuell@gmail.com>",
+  "main": "app.js",
+  "scripts": {
+    "lint": "npx eslint *.js --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Uzodimma01/you_v.git"
+  },
+  "keywords": [
+    "nodejs",
+    "bootstrap",
+    "express"
+  ],
+  "author": "Uzodimma",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Uzodimma01/you_v/issues"
+  },
+  "homepage": "https://github.com/Uzodimma01/you_v#readme",
+  "dependencies": {
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "mongoose": "^6.7.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.26.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "nodemon": "^2.0.20"
+  }
+}
