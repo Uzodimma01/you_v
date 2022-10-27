@@ -2,6 +2,9 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+orbs:
+  aws-cli: circleci/aws-cli@2.0
+
 jobs:
   Lint-js-files:
     docker:
@@ -13,9 +16,44 @@ jobs:
           npm audit 
           npm run lint
 
+  Create-db-infrastructure:
+    executor: aws-cli/default
+    steps:
+      - checkout
+      - aws-cli/setup:
+          aws-access-key-id: Access_key
+          aws-secret-access-key: Secret_key
+          aws-region: region
+
+      - run:
+          name: "Creating db on AWS"
+          command: |
+           aws cloudformation create-stack \
+            --stack-name db-infrastructure \
+            --template-body file://db-infrastructure.yml \
+            --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
+            --region=us-east-1
+
+      - run:
+          name: "Getting deployed instance dns"
+          command: |
+           aws ec2 describe-instances \
+            --filters Name=tag:Name,Values=web-server-db \
+            --query "Reservations[].Instances[].PublicDnsName" \
+            --region=$region > db.txt
+      
+      - save_cache:
+          key: db_dns
+          paths:
+            - ./db.txt
+
+
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   build-workflow:
     jobs:
       - Lint-js-files
+      - Create-db-infrastructure:
+          requires:
+            - Lint-js-files

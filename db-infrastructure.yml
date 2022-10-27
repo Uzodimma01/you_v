@@ -1,0 +1,15 @@
+Resources:
+ InstanceType:
+    Type: AWS::EC2::Instance
+    Properties:
+      Tags: 
+        - Key: "Name"
+          Value: "web-server-db"
+      ImageId: ami-0ee23bfc74a881de5
+      KeyName: Stackup
+      SecurityGroups: ["db"]
+      InstanceType: t3.small
+      BlockDeviceMappings:
+      - DeviceName: "/dev/sdk"
+        Ebs:
+          VolumeSize: '8'
