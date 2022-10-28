@@ -35,25 +35,44 @@ jobs:
             --region=us-east-1
 
       - run:
+          name: "Waiting for server to come up"
+          command: |
+           echo "Waiting for 120 seconds for server to come up"
+           sleep 2m
+
+      - run:
           name: "Getting deployed instance dns"
           command: |
            aws ec2 describe-instances \
             --filters Name=tag:Name,Values=web-server-db \
             --query "Reservations[].Instances[].PublicDnsName" \
-            --region=$region | tee db_dns.txt
-           
-           echo ls
-           ls -al
-           ls -al .circleci
-           cp db_dns.txt .circleci
-           echo ls
-           ls -al
-           ls -al .circleci
-      
+            --region=$region | tail -n 2| head -n 1 | tee db_dns.txt # get last deployed dns, append to file and also display on stdout
+           sed -i 's/"\|  //g' db_dns.txt # format content of file by stripping unwanted characters (spaces and quotation marks)
+                 
       - save_cache:
           key: db_dns
           paths:
             - ./db_dns.txt
+
+  Install-MongoDb:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - restore_cache:
+          key: db_ip
+      - run: | 
+          echo [db]> inventory
+          echo $db_dns.txt >> inventory
+          cp db_dns ./roles/mongodb/files
+      - add_ssh_keys:
+          fingerprints: [cb:0e:fb:d8:4d:32:f3:6e:48:85:93:81:58:ea:c0:ca]
+      - run: 
+          name: "install ansible"
+          command: |
+            apk add --update ansible
+
+
 
 
 # Invoke jobs via workflows
@@ -65,3 +84,6 @@ workflows:
       - Create-db-infrastructure:
           requires:
             - Lint-js-files
+      - Install-MongoDb:
+          requires:
+            - Create-db-infrastructure
