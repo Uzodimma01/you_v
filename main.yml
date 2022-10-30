@@ -1,12 +1,12 @@
 ---
 - name: Configuring mongodb
-  host: db
+  hosts: db
   user: ubuntu
   roles:
     - mongodb
 
-  - name: Configuring prometheus
-  host: db
-  user: ubuntu
-  roles:
-    - prometheus
+  # - name: Configuring prometheus
+  # hosts: db
+  # user: ubuntu
+  # roles:
+  #   - prometheus

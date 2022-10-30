@@ -10,9 +10,11 @@
     state: latest
     update_cache: yes
 
-- name: "Bind ip to mongodb"
+- name: "Copy dns to server"
   template:
     src: db_dns.txt
     dest: /home/ubuntu/db_dns.txt
+
+- name: "Bind ip to mongodb"
   shell:
     echo $db_dns.txt

@@ -29,7 +29,7 @@ jobs:
           name: "Creating db on AWS"
           command: |
            aws cloudformation create-stack \
-            --stack-name db-infrastructure \
+            --stack-name web-server-db-$CIRCLE_WORKFLOW_ID \
             --template-body file://db-infrastructure.yml \
             --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
             --region=us-east-1
@@ -37,20 +37,20 @@ jobs:
       - run:
           name: "Waiting for server to come up"
           command: |
-           echo "Waiting for 120 seconds for server to come up"
-           sleep 2m
+           echo "Waiting for 60 seconds for server to come up"
+           sleep 60s
 
       - run:
           name: "Getting deployed instance dns"
           command: |
            aws ec2 describe-instances \
-            --filters Name=tag:Name,Values=web-server-db \
+            --filters Name=tag:aws:cloudformation:stack-name,Values=web-server-db-$CIRCLE_WORKFLOW_ID \
             --query "Reservations[].Instances[].PublicDnsName" \
             --region=$region | tail -n 2| head -n 1 | tee db_dns.txt # get last deployed dns, append to file and also display on stdout
            sed -i 's/"\|  //g' db_dns.txt # format content of file by stripping unwanted characters (spaces and quotation marks)
                  
       - save_cache:
-          key: db_dns
+          key: db_dns-$CIRCLE_WORKFLOW_ID
           paths:
             - ./db_dns.txt
 
@@ -60,17 +60,18 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: db_ip
+          key: db_dns-$CIRCLE_WORKFLOW_ID
       - run: | 
-          echo [db]> inventory
-          echo $db_dns.txt >> inventory
-          cp db_dns ./roles/mongodb/files
+          echo [db] > inventory
+          cat /home/circleci/project/db_dns.txt >> inventory
+          cp inventory ./roles/mongodb/files
       - add_ssh_keys:
           fingerprints: [cb:0e:fb:d8:4d:32:f3:6e:48:85:93:81:58:ea:c0:ca]
       - run: 
           name: "install ansible"
           command: |
             apk add --update ansible
+            ansible-playbook main.yml -i inventory --private-key=$fingerprints
 
 
 
