@@ -62,14 +62,14 @@ jobs:
       - restore_cache:
           key: db_dnso
       - run: | 
-          echo [db] > inventory
+          echo [db] > inventory.txt
           cat /home/circleci/project/db_dns.txt >> db_dns
           mkdir -p ./roles/mongodb/files
           mv db_dns ./roles/mongodb/files
           cat ./roles/mongodb/files/db_dns
           cat /home/circleci/project/db_dns.txt
-          cat /home/circleci/project/db_dns.txt >> inventory
-          cat inventory
+          cat /home/circleci/project/db_dns.txt >> inventory.txt
+          cat inventory.txt
           pwd
           ls
       - add_ssh_keys:
