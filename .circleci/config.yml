@@ -50,7 +50,7 @@ jobs:
            sed -i 's/"\|  //g' db_dns.txt # format content of file by stripping unwanted characters (spaces and quotation marks)
                  
       - save_cache:
-          key: db_dns-1
+          key: db_dns1
           paths:
             - ./db_dns.txt
 
@@ -60,7 +60,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: db_dns-1
+          key: db_dns1
       - run: | 
           echo [db] > inventory
           cat /home/circleci/project/db_dns.txt >> inventory
