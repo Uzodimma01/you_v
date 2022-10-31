@@ -50,7 +50,7 @@ jobs:
            sed -i 's/"\|  //g' db_dns.txt # format content of file by stripping unwanted characters (spaces and quotation marks)
                  
       - save_cache:
-          key: db_dns2
+          key: db_dnso
           paths:
             - ./db_dns.txt
 
@@ -60,14 +60,18 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: db_dns2
+          key: db_dnso
       - run: | 
-          echo [db] > inventory
-          cat /home/circleci/project/db_dns.txt >> inventory
+          echo [db] > db_dns
+          cat /home/circleci/project/db_dns.txt >> db_dns
           mkdir -p ./roles/mongodb/files
-          cp inventory ./roles/mongodb/files
-          cat ./roles/mongodb/files/inventory
+          cp db_dns ./roles/mongodb/files
+          cat ./roles/mongodb/files/db_dns
           cat /home/circleci/project/db_dns.txt
+          cat /home/circleci/project/db_dns.txt > inventory
+          cat inventory
+          pwd
+          ls
       - add_ssh_keys:
           fingerprints: [cb:0e:fb:d8:4d:32:f3:6e:48:85:93:81:58:ea:c0:ca]
       - run: 
