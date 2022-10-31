@@ -74,7 +74,7 @@ jobs:
           name: "install ansible"
           command: |
             apk add --update ansible
-            ansible-playbook -i ./inventory main.yml --private-key=$fingerprints
+            ansible-playbook -i ./inventory main.yml --private-key $fingerprints
 
 
 
