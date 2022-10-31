@@ -1,6 +1,6 @@
 ---
 - name: Configuring mongodb
-  hosts: db
+  hosts: ec2-34-200-218-167.compute-1.amazonaws.com
   user: ubuntu
   become: true
   gather_facts: false
