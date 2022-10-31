@@ -25,48 +25,48 @@ jobs:
           aws-secret-access-key: Secret_key
           aws-region: region
 
-      # - run:
-      #     name: "Creating db on AWS"
-      #     command: |
-      #      aws cloudformation create-stack \
-      #       --stack-name web-server-db-$CIRCLE_WORKFLOW_ID \
-      #       --template-body file://db-infrastructure.yml \
-      #       --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
-      #       --region=us-east-1
+      - run:
+          name: "Creating db on AWS"
+          command: |
+           aws cloudformation create-stack \
+            --stack-name web-server-db-$CIRCLE_WORKFLOW_ID \
+            --template-body file://db-infrastructure.yml \
+            --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
+            --region=us-east-1
 
-      # - run:
-      #     name: "Waiting for server to come up"
-      #     command: |
-      #      echo "Waiting for 60 seconds for server to come up"
-      #      sleep 60s
+      - run:
+          name: "Waiting for server to come up"
+          command: |
+           echo "Waiting for 60 seconds for server to come up"
+           sleep 60s
 
-      # - run:
-      #     name: "Getting deployed instance dns"
-      #     command: |
-      #      aws ec2 describe-instances \
-      #       --filters Name=tag:aws:cloudformation:stack-name,Values=web-server-db-$CIRCLE_WORKFLOW_ID \
-      #       --query "Reservations[].Instances[].PublicDnsName" \
-      #       --region=$region | tail -n 2| head -n 1 | tee db_dns.txt # get last deployed dns, append to file and also display on stdout
-      #      sed -i 's/"\|  //g' db_dns.txt # format content of file by stripping unwanted characters (spaces and quotation marks)
+      - run:
+          name: "Getting deployed instance dns"
+          command: |
+           aws ec2 describe-instances \
+            --filters Name=tag:aws:cloudformation:stack-name,Values=web-server-db-$CIRCLE_WORKFLOW_ID \
+            --query "Reservations[].Instances[].PublicDnsName" \
+            --region=$region | tail -n 2| head -n 1 | tee db_dns.txt # get last deployed dns, append to file and also display on stdout
+           sed -i 's/"\|  //g' db_dns.txt # format content of file by stripping unwanted characters (spaces and quotation marks)
                  
-      # - save_cache:
-      #     key: db_dnso
-      #     paths:
-      #       - ./db_dns.txt
+      - save_cache:
+          key: db_dns21
+          paths:
+            - ./db_dns.txt
 
   Install-MongoDb:
     docker:
       - image: python:3.7-alpine3.11
     steps:
       - checkout
-      # - restore_cache:
-      #     key: db_dnso
-      # - run: | 
-      #     echo [db] > inventory
-      #     cat /home/circleci/project/db_dns.txt > db_dns
-      #     mkdir -p ./roles/mongodb/files
-      #     mv db_dns ./roles/mongodb/files
-      #     cat /home/circleci/project/db_dns.txt >> inventory
+      - restore_cache:
+          key: db_dns21
+      - run: | 
+          echo [db] > inventory
+          cat /home/circleci/project/db_dns.txt > db_dns
+          mkdir -p ./roles/mongodb/files
+          mv db_dns ./roles/mongodb/files
+          cat /home/circleci/project/db_dns.txt >> inventory
 
       - add_ssh_keys:
           fingerprints: [cb:0e:fb:d8:4d:32:f3:6e:48:85:93:81:58:ea:c0:ca]
@@ -74,7 +74,7 @@ jobs:
           name: "install ansible"
           command: |
             apk add --update ansible
-            ansible-playbook -i ./inventory main.yml --private-key $fingerprints
+            ansible-playbook -i ./inventory main.yml --private-key=$fingerprints
 
 
 
