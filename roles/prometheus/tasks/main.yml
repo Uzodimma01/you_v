@@ -1,0 +1,11 @@
+- name: "Upgrade packages"
+  become: yes
+  apt:
+    upgrade: yes
+
+- name: "Install terraform"
+  become: yes
+  apt:
+    name: terraform
+    state: latest
+    update_cache: yes

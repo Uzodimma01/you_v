@@ -3,18 +3,27 @@
   apt:
     upgrade: yes
 
-- name: "Install mongodb"
-  become: yes
-  apt:
-    name: ["mongodb"]
-    state: latest
-    update_cache: yes
-
 - name: "Copy dns to server"
   template:
     src: db_dns.txt
     dest: /home/ubuntu/db_dns.txt
 
+- name: "Install mongodb"
+  become: yes
+  shell: |
+    curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+    apt-key list
+    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+    apt update
+    apt install mongodb-org
+
 - name: "Bind ip to mongodb"
-  shell:
+  shell: |
     echo $db_dns.txt
+    sed -i "s+127.0.0.1+$(</home/ubuntu/db_dns.txt)\n  bindIpAll: true+g" /etc/mongo.conf
+
+- name: "Starting mongodb service"
+  become: yes
+  shell: |
+    systemctl enable mongod
+    systemctl status mongod

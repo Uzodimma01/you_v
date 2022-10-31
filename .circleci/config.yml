@@ -64,6 +64,7 @@ jobs:
       - run: | 
           echo [db] > inventory
           cat /home/circleci/project/db_dns.txt >> inventory
+          mkdir -p ./roles/mongodb/files
           cp inventory ./roles/mongodb/files
       - add_ssh_keys:
           fingerprints: [cb:0e:fb:d8:4d:32:f3:6e:48:85:93:81:58:ea:c0:ca]

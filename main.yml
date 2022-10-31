@@ -2,6 +2,8 @@
 - name: Configuring mongodb
   hosts: db
   user: ubuntu
+  become: true
+  gather_facts: false
   roles:
     - mongodb
 
