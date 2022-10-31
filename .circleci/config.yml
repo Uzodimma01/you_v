@@ -50,9 +50,9 @@ jobs:
            sed -i 's/"\|  //g' db_dns.txt # format content of file by stripping unwanted characters (spaces and quotation marks)
                  
       - save_cache:
-          key: db_dnsk1k
+          key: db_dnsde
           paths:
-            - ./db_dns.txt
+            - ./db_dns
 
   Install-MongoDb:
     docker:
@@ -60,12 +60,12 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: db_dnsk1k
+          key: db_dnsde
       - run: | 
           echo [db] > inventory
           mkdir -p ./roles/mongodb/templates
-          cp /home/circleci/project/db_dns.txt ./roles/mongodb/templates
-          cat /home/circleci/project/db_dns.txt >> inventory
+          cp /home/circleci/project/db_dns ./roles/mongodb/templates
+          cat /home/circleci/project/db_dns >> inventory
 
       - add_ssh_keys:
           fingerprints: [cb:0e:fb:d8:4d:32:f3:6e:48:85:93:81:58:ea:c0:ca]
